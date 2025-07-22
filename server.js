@@ -33,13 +33,16 @@ myDB(async (client) => {
   const myDataBase = client.db('database').collection('users');
 
   // Routes
-  app.get('/', (req, res) => {
-    res.render('index', {
-      title: 'Connected to Database',
-      message: 'Please login',
-      showLogin: true
-    });
+  app.route('/').get((req, res) => {
+  res.render('index', {
+    title: 'Connected to Database',
+    message: 'Please login or register',
+    showLogin: true,
+    showRegistration: true,
+    showSocialAuth: true
   });
+});
+
 
   app.post('/login',
     passport.authenticate('local', { failureRedirect: '/' }),
@@ -62,6 +65,14 @@ myDB(async (client) => {
       return done(null, user);
     });
   }));
+
+  app.post('/logout', (req, res, next) => {
+  req.logout(err => {
+    if (err) return next(err);
+    res.redirect('/');
+  });
+});
+
 
   passport.serializeUser((user, done) => {
     done(null, user._id);

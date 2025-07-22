@@ -8,12 +8,9 @@ html
     link(rel='stylesheet', href='/public/style.css')
   body
     h1.border.center FCC Advanced Node and Express
-h2.center#pug-success-message #{title}
-p#pug-variable= message
-  
-    
-    
-    
+    h2.center#pug-success-message #{title}
+    p#pug-variable= message
+
     if showLogin
       hr
       h2.center Login Form
@@ -26,7 +23,7 @@ p#pug-variable= message
           input(type='password', name='password')
         div
           input(type='submit', value='Log In')
-          
+
     if showRegistration
       hr
       h2.center Registration Form
