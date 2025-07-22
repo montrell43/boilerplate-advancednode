@@ -66,11 +66,8 @@ myDB(async client => {
 
     app.post('/register', (req, res) => {
   const { username, password } = req.body;
-  myDataBase.findOne({ username: username }, (err, user) => {
-    console.log("User " + username + " attempted to log in.");
-    if (err) return res.redirect('/');
-    if (user) return res.redirect('/'); // already exists
-
+  myDataBase.findOne({ username }, (err, user) => {
+    if (err || user) return res.redirect('/');
     myDataBase.insertOne({ username, password }, (err, doc) => {
       if (err) return res.redirect('/');
       res.redirect('/');
