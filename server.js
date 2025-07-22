@@ -15,7 +15,7 @@ const { ObjectID } = require('mongodb');
 const { MongoClient } = require('mongodb');
 const url = 'mongodb+srv://tmerriweather:test1234@cluster0.eugw6oa.mongodb.net/exercise-tracker?retryWrites=true&w=majority';
 
-const client = new MongoClient(uri);
+const client = new MongoClient(url);
 
 client.connect()
   .then(() => {
