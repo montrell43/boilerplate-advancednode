@@ -12,6 +12,19 @@ const path = require('path');
 const app = express();
 
 const { ObjectID } = require('mongodb');
+const { MongoClient } = require('mongodb');
+const url = 'mongodb+srv://tmerriweather:test1234@cluster0.eugw6oa.mongodb.net/exercise-tracker?retryWrites=true&w=majority';
+
+const client = new MongoClient(uri);
+
+client.connect()
+  .then(() => {
+    console.log('✅ Connected to MongoDB');
+    return client.close();
+  })
+  .catch(err => {
+    console.error('❌ Connection failed:', err.message);
+  });
 
 // Middleware
 app.use(cors());
