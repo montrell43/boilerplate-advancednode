@@ -7,38 +7,29 @@ html
     meta(name='viewport', content='width=device-width, initial-scale=1')
     link(rel='stylesheet', href='/public/style.css')
   body
-    h1.border.center FCC Advanced Node and Express
-    h2.center#pug-success-message #{title}
-    p#pug-variable= message
+   h1.center FCC Advanced Node and Express
+
+    h2.center #{title}
+    p.center #{message}
 
     if showLogin
-      hr
-      h2.center Login Form
+      h2.center Login
       form(action='/login', method='post').center
-        div
-          label Username:
-          input(type='text', name='username')
-        div
-          label Password:
-          input(type='password', name='password')
-        div
-          input(type='submit', value='Log In')
+        label Username:
+        input(type='text', name='username')
+        label Password:
+        input(type='password', name='password')
+        input(type='submit', value='Log In')
 
     if showRegistration
-      hr
-      h2.center Registration Form
+      h2.center Register
       form(action='/register', method='post').center
-        div
-          label Username:
-          input(type='text', name='username')
-        div
-          label Password:
-          input(type='password', name='password')
-        div
-          input(type='submit', value='Register')
+        label Username:
+        input(type='text', name='username')
+        label Password:
+        input(type='password', name='password')
+        input(type='submit', value='Register')
 
     if showSocialAuth
-      hr
       h2.center Social Login
-      .login.center
-        a(href='/auth/github').text Login with Github!
+      a(href='/auth/github') Login with GitHub
