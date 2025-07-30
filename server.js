@@ -44,9 +44,7 @@ myDB(async client => {
   app.route("/login").post(passport.authenticate("local", 
   { failureRedirect: "/" }), 
   (req, res) => {
-    if (req.body) {
-      console.log(req.body);
-    }
+    res.redirect("/")
   });
 
   passport.serializeUser((user, done) => {
