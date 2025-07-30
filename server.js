@@ -5,7 +5,7 @@ const session = require('express-session');
 const passport = require('passport');
 const myDB = require('./connection');
 const routes = require('./routes');
-const auth = require('./auth.js');
+const auth = require('./auth');
 const path = require('path');
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
 
@@ -16,7 +16,7 @@ app.set('views', path.join(__dirname, 'views/pug'));
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-fccTesting(app); // For FCC testing
+fccTesting(app);
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'keyboard cat',
@@ -28,10 +28,20 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 myDB(async (client) => {
-  const myDataBase = client.db('exercise-tracker');
+  const myDataBase = await client.db('exercise-tracker').collection("users");
 
+  // 🔧 Auth setup must be here
   auth(app, myDataBase);
+
+  // 🛣 Routes must come after auth
   routes(app, myDataBase);
+
+  // ✅ Optional test route
+  app.post('/login/password',
+    passport.authenticate('local', { failureRedirect: '/', failureMessage: true }),
+    function(req, res) {
+      res.redirect('/profile');
+    });
 
   app.listen(process.env.PORT || 3000, () => {
     console.log("Listening on port " + (process.env.PORT || 3000));
