@@ -42,7 +42,7 @@ myDB(async client => {
   });
 
   app.route("/login").post(passport.authenticate("local", 
-  { failedRedirect: "/" }), 
+  { failureRedirect: "/" }), 
   (req, res) => {
     if (req.body) {
       console.log(req.body);
