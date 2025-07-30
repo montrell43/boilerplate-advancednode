@@ -3,11 +3,11 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
+const path = require('path');
+const fccTesting = require('./freeCodeCamp/fcctesting.js');
 const myDB = require('./connection');
 const routes = require('./routes');
 const auth = require('./auth');
-const path = require('path');
-const fccTesting = require('./freeCodeCamp/fcctesting.js');
 
 const app = express();
 
@@ -21,36 +21,29 @@ fccTesting(app);
 app.use(session({
   secret: process.env.SESSION_SECRET || 'keyboard cat',
   resave: true,
-  saveUninitialized: true,
+  saveUninitialized: true
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 myDB(async (client) => {
-  const myDataBase = await client.db('exercise-tracker').collection("users");
+  const myDataBase = await client.db('exercise-tracker').collection('users');
 
-  // 🔧 Auth setup must be here
   auth(app, myDataBase);
-
-  // 🛣 Routes must come after auth
   routes(app, myDataBase);
 
-  // ✅ Optional test route
-  app.post('/login/password',
-    passport.authenticate('local', { failureRedirect: '/', failureMessage: true }),
-    function(req, res) {
-      res.redirect('/profile');
+  app.post('/login',
+    passport.authenticate('local', { failureRedirect: '/' }),
+    (req, res) => {
+      res.redirect('/');
     });
 
   app.listen(process.env.PORT || 3000, () => {
-    console.log("Listening on port " + (process.env.PORT || 3000));
+    console.log('Listening on port ' + (process.env.PORT || 3000));
   });
-}).catch((e) => {
+}).catch((err) => {
   app.route('/').get((req, res) => {
-    res.render('index', {
-      title: e,
-      message: 'Unable to connect to database',
-    });
+    res.render('index', { title: err, message: 'Unable to connect to database' });
   });
 });
