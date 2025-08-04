@@ -6,9 +6,11 @@ const passport = require('passport');
 const myDB = require('./connection');
 const auth = require('./auth');
 const path = require('path');
+const cors = require("cors");
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
 
 const app = express();
+app.use(cors());
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views/pug'));
@@ -37,21 +39,18 @@ myDB(async (client) => {
       title: 'Hello',
       message: 'Please login',
       showLogin: true,
-      showRegistration: true
+      //showRegistration: true
     });
   });
 
-  app.post('/login',
-    passport.authenticate('local', { failureRedirect: '/' }),
-    (req, res) => {
-      console.log(`User ${req.user.username} logged in.`);
-      res.redirect('/profile');
-    }
-  );
+  
+   app.route('/login').post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
+    res.redirect('/profile');
+  })
 
   app.get('/profile', (req, res) => {
-    if (!req.isAuthenticated()) return res.redirect('/');
-    res.render('profile', { username: req.user.username });
+    //if (!req.isAuthenticated()) return res.redirect('/');
+    res.render('profile');
   });
 
   app.listen(process.env.PORT || 3000, () => {

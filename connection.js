@@ -13,6 +13,6 @@ module.exports = async function(callback) {
   } catch (e) {
     console.error('❌ MongoDB connection error:', e);
   } finally {
-    await client.close();
+    //await client.close();
   }
 };
