@@ -1,15 +1,7 @@
-html
-  head
-    title FCC Advanced Node and Express
-  body
-    h1.center #{title}
-    p.center #{message}
-
-    if showLogin
-      h2.center Login
-      form(action='/login', method='post').center
-        label Username:
-        input(type='text', name='username')
-        label Password:
-        input(type='password', name='password')
-        input(type='submit', value='Log In')
+if showRegistration
+  form(action='/register', method='post')
+    label Username:
+    input(type='text', name='username', required)
+    label Password:
+    input(type='password', name='password', required)
+    button(type='submit') Register
