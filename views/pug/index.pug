@@ -1,7 +1,35 @@
-if showRegistration
-  form(action='/register', method='post')
-    label Username:
-    input(type='text', name='username', required)
-    label Password:
-    input(type='password', name='password', required)
-    button(type='submit') Register
+html
+  head
+    title FCC Advanced Node and Express
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='/public/style.css')
+  body
+    h1.center FCC Advanced Node and Express
+
+    h2.center #{title}
+    p.center #{message}
+
+    if showLogin
+      h3.center Login
+      form(action='/login', method='post').center
+        div
+          label(for='username') Username:
+          input(type='text', name='username', required)
+        div
+          label(for='password') Password:
+          input(type='password', name='password', required)
+        div
+          input(type='submit', value='Log In')
+
+    if showRegistration
+      h3.center Register
+      form(action='/register', method='post').center
+        div
+          label(for='username') Username:
+          input(type='text', name='username', required)
+        div
+          label(for='password') Password:
+          input(type='password', name='password', required)
+        div
+          input(type='submit', value='Register')
