@@ -3,19 +3,17 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
-const myDB = require('./connection');
-const fccTesting = require('./freeCodeCamp/fcctesting.js');
 const ObjectID = require('mongodb').ObjectID;
 const LocalStrategy = require('passport-local');
+const myDB = require('./connection');
+const fccTesting = require('./freeCodeCamp/fcctesting.js');
 const path = require('path');
 
 const app = express();
 
-// Set view engine
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views/pug'));
 
-// Static and middleware
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -25,14 +23,13 @@ fccTesting(app); // For FCC testing
 app.use(session({
   secret: process.env.SESSION_SECRET || 'keyboard cat',
   resave: true,
-  saveUninitialized: true,
-  cookie: { secure: false }
+  saveUninitialized: true
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-myDB(async (client) => {
+myDB(async client => {
   const myDataBase = await client.db('database').collection('users');
 
   // Root route
@@ -44,7 +41,7 @@ myDB(async (client) => {
     });
   });
 
-  // Passport config
+  // Passport configuration
   passport.use(new LocalStrategy((username, password, done) => {
     myDataBase.findOne({ username: username }, (err, user) => {
       console.log(`User ${username} attempted to log in.`);
@@ -65,7 +62,7 @@ myDB(async (client) => {
     });
   });
 
-  // Login route
+  // POST /login route - required for FCC test
   app.route('/login').post(
     passport.authenticate('local', { failureRedirect: '/' }),
     (req, res) => {
@@ -73,28 +70,18 @@ myDB(async (client) => {
     }
   );
 
-  // Optional: Add a registration route if needed
-  app.route('/register').post((req, res) => {
-    const { username, password } = req.body;
-    myDataBase.findOne({ username: username }, (err, user) => {
-      if (err || user) return res.redirect('/');
-      myDataBase.insertOne({ username, password }, (err, doc) => {
-        if (err) return res.redirect('/');
-        res.redirect('/');
-      });
-    });
+  // Start server
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}`);
   });
 
-  // Start server after DB connection
-  app.listen(process.env.PORT || 3000, () => {
-    console.log('Listening on port ' + (process.env.PORT || 3000));
-  });
-
-}).catch((e) => {
+}).catch(err => {
   app.route('/').get((req, res) => {
     res.render('index', {
-      title: e,
-      message: 'Unable to connect to database'
+      title: err,
+      message: 'Unable to connect to database',
+      showLogin: false
     });
   });
 });
