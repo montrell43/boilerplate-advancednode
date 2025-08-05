@@ -48,7 +48,17 @@ myDB(async (client) => {
     res.redirect('/profile');
   })
 
-  app.get('/profile', (req, res) => {
+  
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/');
+}
+
+
+  app.route('/profile').get(ensureAuthenticated, (req, res) => {
+    
     //if (!req.isAuthenticated()) return res.redirect('/');
     res.render('profile');
   });
