@@ -23,11 +23,20 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: true,
   saveUninitialized: true,
-  cookie: { secure: process.env.NODE_ENV === "productio" }
+  cookie: { secure: process.env.NODE_ENV === "production" }
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    console.log("Checking authenication")
+    return next();
+  }
+  console.log("Not authenicated, redirecting")
+  res.redirect('/');
+}
 
 myDB(async (client) => {
   const myDataBase = await client.db('exercise-tracker').collection('users');
@@ -37,7 +46,7 @@ myDB(async (client) => {
   app.route('/').get((req, res) => {
     res.render('index', {
       title: 'Connected to Database',
-      message: 'Please login',
+      message: 'Home page',
       showLogin: true,
       //showRegistration: true
     });
@@ -87,14 +96,7 @@ myDB(async (client) => {
   });
 });
 
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    console.log("Checking authenication")
-    return next();
-  }
-  console.log("Not authenicated, redirecting")
-  res.redirect('/');
-}
+
 app.listen(process.env.PORT || 3000, () => {
     console.log('Listening on port ' + (process.env.PORT || 3000));
   });
