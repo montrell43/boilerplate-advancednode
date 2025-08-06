@@ -89,8 +89,10 @@ myDB(async (client) => {
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
+    console.log("Checking authenication")
     return next();
   }
+  console.log("Not authenicated, redirecting")
   res.redirect('/');
 }
 app.listen(process.env.PORT || 3000, () => {
