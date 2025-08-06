@@ -36,7 +36,7 @@ myDB(async (client) => {
 
   app.route('/').get((req, res) => {
     res.render('index', {
-      title: 'Hello',
+      title: 'Connected to Database',
       message: 'Please login',
       showLogin: true,
       //showRegistration: true
@@ -48,21 +48,13 @@ myDB(async (client) => {
     res.redirect('/profile');
   })
 
-  
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect('/');
-}
-
-
   app.route('/profile').get(ensureAuthenticated, (req, res) => {
     
     //if (!req.isAuthenticated()) return res.redirect('/');
     res.render('profile');
   });
 
+  
   app.listen(process.env.PORT || 3000, () => {
     console.log('Listening on port ' + (process.env.PORT || 3000));
   });
@@ -74,3 +66,10 @@ function ensureAuthenticated(req, res, next) {
     });
   });
 });
+
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/');
+}
