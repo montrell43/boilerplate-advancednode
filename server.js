@@ -26,11 +26,7 @@ app.use(session({
   cookie: { secure: process.env.NODE_ENV === "production" }
 }));
 
-app.use((req, res, next) => {
-  res.status(404)
-    .type('text')
-    .send('Not Found');
-});
+
 
 
 app.use(passport.initialize());
@@ -47,6 +43,11 @@ function ensureAuthenticated(req, res, next) {
 
 myDB(async (client) => {
   const myDataBase = await client.db('exercise-tracker').collection('users');
+  app.use((req, res, next) => {
+  res.status(404)
+    .type('text')
+    .send('Not Found');
+});
 
   auth(app, myDataBase);
 
