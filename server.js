@@ -69,7 +69,7 @@ app.route('/logout')
   .get((req, res, next) => {
     req.logout(function(err) {
       if (err) { return next(err); }
-      res.redirect('/');
+     return res.redirect('/');
     });
   });
 
@@ -79,8 +79,6 @@ app.use((req, res, next) => {
     .type('text')
     .send('Not Found');
 });
-
-
 
     passport.use(new LocalStrategy((username, password, done) => {
     myDataBase.findOne({ username: username }, (err, user) => {
