@@ -23,28 +23,16 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: true,
   saveUninitialized: true,
-  cookie: { secure: process.env.NODE_ENV === "production" }
+  cookie: { secure: false }
 }));
-
-
-
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    console.log("Checking authenication")
-    return next();
-  }
-  console.log("Not authenicated, redirecting")
-  res.redirect('/');
-}
-
 myDB(async (client) => {
-  const myDataBase = await client.db('exercise-tracker').collection('users');
+  const myDataBase = await client.db('database').collection('users');
 
-  auth(app, myDataBase);
+  //auth(app, myDataBase);
 
   app.route('/').get((req, res) => {
     res.render('index', {
@@ -66,12 +54,9 @@ myDB(async (client) => {
 
 // Logout route
 app.route('/logout')
-  .get((req, res, next) => {
-    req.logout(function(err) {
-      if (err) { return next(err); }
-      console.log("User has been logged out. Redirecting to home.");
-      return res.redirect('/');
-    });
+  .get((req, res) => {
+    req.logout()
+    ;res.redirect('/')
   });
 
 // 404 middleware (last)
@@ -102,9 +87,6 @@ app.use((req, res, next) => {
     });
   });
 
-
-  
-  
 }).catch(e => {
   app.route('/').get((req, res) => {
     res.render('index', {
@@ -114,6 +96,14 @@ app.use((req, res, next) => {
   });
 });
 
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    console.log("Checking authenication")
+    return next();
+  }
+  console.log("Not authenicated, redirecting")
+  res.redirect('/');
+}
 
 app.listen(process.env.PORT || 3000, () => {
     console.log('Listening on port ' + (process.env.PORT || 3000));
