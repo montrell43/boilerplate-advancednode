@@ -43,11 +43,6 @@ function ensureAuthenticated(req, res, next) {
 
 myDB(async (client) => {
   const myDataBase = await client.db('exercise-tracker').collection('users');
-  app.use((req, res, next) => {
-  res.status(404)
-    .type('text')
-    .send('Not Found');
-});
 
   auth(app, myDataBase);
 
@@ -67,6 +62,12 @@ myDB(async (client) => {
 
   app.route('/profile').get(ensureAuthenticated, (req, res) => {
   res.render('profile', { username: req.user.username });
+});
+
+app.use((req, res, next) => {
+  res.status(404)
+    .type('text')
+    .send('Not Found');
 });
 
 app.route('/logout')
