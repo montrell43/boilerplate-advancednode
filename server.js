@@ -69,7 +69,8 @@ app.route('/logout')
   .get((req, res, next) => {
     req.logout(function(err) {
       if (err) { return next(err); }
-     return res.redirect('/');
+      console.log("User has been logged out. Redirecting to home.");
+      return res.redirect('/');
     });
   });
 
