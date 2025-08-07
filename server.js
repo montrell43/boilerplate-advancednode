@@ -8,6 +8,8 @@ const auth = require('./auth');
 const path = require('path');
 const cors = require("cors");
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
+const { ObjectID } = require("mongodb");
+LocalStrategy = require("passport-local");
 
 const app = express();
 app.use(cors());
@@ -31,13 +33,12 @@ app.use(passport.session());
 
 myDB(async (client) => {
   const myDataBase = await client.db('database').collection('users');
-
   //auth(app, myDataBase);
 
   app.route('/').get((req, res) => {
     res.render('index', {
       title: 'Connected to Database',
-      message: 'Home page',
+      message: 'Please log in',
       showLogin: true,
       showRegistration: true
     });
