@@ -9,7 +9,7 @@ const path = require('path');
 const cors = require("cors");
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
 const { ObjectID } = require("mongodb");
-LocalStrategy = require("passport-local");
+const LocalStrategy = require("passport-local");
 
 const app = express();
 app.use(cors());
