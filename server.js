@@ -64,17 +64,22 @@ myDB(async (client) => {
   res.render('profile', { username: req.user.username });
 });
 
+// Logout route
+app.route('/logout')
+  .get((req, res, next) => {
+    req.logout(function(err) {
+      if (err) { return next(err); }
+      res.redirect('/');
+    });
+  });
+
+// 404 middleware (last)
 app.use((req, res, next) => {
   res.status(404)
     .type('text')
     .send('Not Found');
 });
 
-app.route('/logout')
-  .get((req, res) => {
-    req.logout();
-    res.redirect('/');
-});
 
 
     passport.use(new LocalStrategy((username, password, done) => {
