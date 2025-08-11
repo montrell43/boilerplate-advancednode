@@ -58,11 +58,12 @@ app.get('/profile', ensureAuthenticated, (req, res) => {
 
 
 // Logout route
-app.route('/logout')
-  .get((req, res) => {
-    req.logout();
+app.get('/logout', (req, res, next) => {
+  req.logout(function(err) {
+    if (err) { return next(err); }
     res.redirect('/');
   });
+});
 
 
 
