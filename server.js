@@ -66,7 +66,7 @@ myDB(async (client) => {
   // Home route with login & registration forms
   app.route('/').get((req, res) => {
     res.render('index', {
-      title: 'Connected to Database',
+      title: 'Welcome',
       message: 'Please log in or register',
       showLogin: true,
       showRegistration: true
