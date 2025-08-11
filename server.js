@@ -55,10 +55,13 @@ myDB(async (client) => {
 
 // Logout route
 app.route('/logout')
-  .get((req, res) => {
-    req.logout()
-    ;res.redirect('/')
+  .get((req, res, next) => {
+    req.logout(function (err) {
+      if (err) { return next(err); }
+      return res.redirect('/');
+    });
   });
+
 
   app.route('/register')
   .post((req, res, next) => {
