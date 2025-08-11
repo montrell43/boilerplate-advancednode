@@ -53,13 +53,13 @@ myDB(async (client) => {
   res.redirect('/');
 }
 
-app.get('/profile', ensureAuthenticated, (req, res) => {
+app.route('/profile').get(ensureAuthenticated, (req, res) => {
   res.render('profile', { username: req.user.username });
 });
 
 
 // Logout route
-app.get('/logout', (req, res, next) => {
+app.route('/logout').get((req, res, next) => {
   req.logout(function(err) {
     if (err) { return next(err); }
     req.session.destroy(() => {   // completely end session
@@ -68,25 +68,31 @@ app.get('/logout', (req, res, next) => {
   });
 });
 
-
-
-
-  app.route('/register')
+app.route('/register')
   .post((req, res, next) => {
-    bcrypt.hash(req.body.password, 12, (err, hash) => {
-  if (err) return res.redirect('/');
-  myDataBase.insertOne({ username: req.body.username, password: hash }, (err, doc) => {
-    if (err) return res.redirect('/');
-    next(null, doc.ops[0]);
-  });
+    // Step 1: Check if username exists
+    myDataBase.findOne({ username: req.body.username }, (err, user) => {
+      if (err) return next(err);        // on error, call next(err)
+      if (user) return res.redirect('/'); // if user exists, redirect home
 
-    })
+      // If user not found, insert the new user
+      myDataBase.insertOne(
+        { username: req.body.username, password: req.body.password }, 
+        (err, doc) => {
+          if (err) return res.redirect('/');  // on insert error, redirect home
+          next(null, doc.ops[0]);             // call next to proceed to authentication
+        }
+      );
+    });
   },
-    passport.authenticate('local', { failureRedirect: '/' }),
-    (req, res, next) => {
-      res.redirect('/profile');
-    }
-  );
+  // Step 2: Authenticate the newly registered user
+  passport.authenticate('local', { failureRedirect: '/' }),
+  // Step 3: Redirect to profile after successful login
+  (req, res) => {
+    res.redirect('/profile');
+  }
+);
+
 
 // 404 middleware (last)
 app.use((req, res, next) => {
