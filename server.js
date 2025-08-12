@@ -58,23 +58,23 @@ myDB(async (client) => {
 app.get('/logout', (req, res, next) => {
   console.log("Logout route hit");
   req.logout(err => {
-    if (err) {
+    if (err) { 
       console.log("Logout error:", err);
       return next(err);
     }
-    console.log("Session destroy start");
     req.session.destroy(err => {
       if (err) {
         console.log("Session destroy error:", err);
-        // still redirect even if session destroy fails to avoid hanging
+        // redirect anyway so it doesn't hang
         return res.redirect('/');
       }
-      console.log("Clearing cookie and redirecting");
+      // Clear the cookie named 'connect.sid' which is default for express-session
       res.clearCookie('connect.sid', { path: '/' });
       res.redirect('/');
     });
   });
 });
+
 
 
 app.route('/register')
