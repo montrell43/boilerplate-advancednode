@@ -66,7 +66,8 @@ app.get('/logout', (req, res, next) => {
     req.session.destroy(err => {
       if (err) {
         console.log("Session destroy error:", err);
-        return next(err);
+        // still redirect even if session destroy fails to avoid hanging
+        return res.redirect('/');
       }
       console.log("Clearing cookie and redirecting");
       res.clearCookie('connect.sid', { path: '/' });
@@ -74,6 +75,7 @@ app.get('/logout', (req, res, next) => {
     });
   });
 });
+
 
 app.route('/register')
   .post((req, res, next) => {
