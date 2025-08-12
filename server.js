@@ -58,7 +58,8 @@ myDB(async (client) => {
 app.route('/logout').get((req, res, next) => {
   req.logout(function(err) {
     if (err) { return next(err); }
-    req.session.destroy(() => {   // completely end session
+    req.session.destroy((err) => { 
+      if (err) { return next(err); }  // completely end session
       res.redirect('/');
     });
   });
