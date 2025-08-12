@@ -5,17 +5,15 @@ html
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
     link(rel='stylesheet', href='/public/style.css')
   body
-    h1.center FCC Advanced Node and Express
+    h1.border.center Home Page freeCodeCampTester
     h1= message
 
-    h2.center#pug-success-message
-    | Looks like this page is being rendered from Pug into HTML!
-    | #{title}
+    h2.center#pug-success-message Looks like this page is being rendered from Pug into HTML! #{title}
     p#pug-variable=message
 
     if showLogin
       h3.center Login
-      form(action='/login', method='post').center
+      form.center(action='/login', method='post')
         div
           label(for='username') Username:
           input(type='text', name='username', required)
@@ -27,7 +25,7 @@ html
 
     if showRegistration
       h3.center Register
-      form(action='/register', method='post').center
+      form.center(action='/register', method='post')
         div
           label(for='username') Username:
           input(type='text', name='username', required)
