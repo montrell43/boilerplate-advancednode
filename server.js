@@ -56,25 +56,19 @@ myDB(async (client) => {
 });
 
 // Logout route
-app.get('/logout', (req, res, next) => {
-  // Passport 0.6+ requires logout to accept a callback
-  req.logout(err => {
-    if (err) return next(err);
-
-    // Destroy the session completely
-    req.session.destroy(err => {
-      if (err) {
-        console.error("Error destroying session during logout:", err);
-        return next(err);
-      }
-
-      // Clear the cookie just in case
-      res.clearCookie('connect.sid', { path: '/' });
-
-      // ✅ Redirect to home (FCC expects this to end request)
-      res.redirect('/');
+app.get('/logout', (req, res) => {
+  console.log('✅ Logout route hit');
+  
+  try {
+    // For Passport >= 0.6
+    req.logout(() => {
+      // Ignore session destroy for now
+      res.status(200).send('Logged out');
     });
-  });
+  } catch (err) {
+    console.error('Logout error:', err);
+    res.status(500).send('Logout failed');
+  }
 });
 
 
