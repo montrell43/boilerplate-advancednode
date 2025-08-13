@@ -11,6 +11,7 @@ const fccTesting = require('./freeCodeCamp/fcctesting.js');
 const { ObjectID } = require("mongodb");
 const LocalStrategy = require("passport-local");
 const bcrypt = require('bcrypt');
+const bodyParser = require("body-parser")
 
 const app = express();
 app.use(cors());
@@ -78,17 +79,17 @@ app.get('/logout', (req, res, next) => {
 
 
 app.route('/register')
-  .post((req, res, next) => {
+  .post(bodyParser.urlencoded({extended: false}),(req, res, next) => {
     // Step 1: Check if username exists
-    myDataBase.findOne({ username: req.body.username }, (err, user) => {
+    myDataBase.collection("users").findOne({ username: req.body.username }, (err, user) => {
       if (err) return next(err);        // on error, call next(err)
       if (user) return res.redirect('/'); // if user exists, redirect home
 
       // If user not found, insert the new user
-      myDataBase.insertOne(
+      myDataBase.collection("users").insertOne(
         { username: req.body.username, password: req.body.password }, 
         (err, doc) => {
-          if (err) {
+          if (!err && doc) {
             return res.redirect('/');
             } else {
               next(null, doc.ops[0]);
