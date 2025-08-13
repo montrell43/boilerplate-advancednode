@@ -9,7 +9,7 @@ html
     h1= message
 
     h2.center#pug-success-message Looks like this page is being rendered from Pug into HTML! #{title}
-    p#pug-variable=message
+    p#pug-variable= message
 
     if showLogin
       h3.center Login
@@ -34,3 +34,8 @@ html
           input(type='password', name='password', required)
         div
           input(type='submit', value='Register')
+
+    if user
+      a(href='/logout') Logout
+    else
+      a(href='/login') Login
