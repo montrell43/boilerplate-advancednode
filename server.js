@@ -94,7 +94,7 @@ app.route('/register')
             } else {
               next(null, doc.ops[0]);
             }  // on insert error, redirect home
-                       // call next to proceed to authentication
+                       // call next to proceed to authentication will not pass
         }
       );
     });
