@@ -75,12 +75,12 @@ app.get('/logout', (req, res) => {
 app.route('/register')
   .post(bodyParser.urlencoded({extended: false}),(req, res, next) => {
     // Step 1: Check if username exists
-    myDataBase.collection("users").findOne({ username: req.body.username }, (err, user) => {
+    myDataBase.findOne({ username: req.body.username }, (err, user) => {
       if (err) return next(err);        // on error, call next(err)
       if (user) return res.redirect('/'); // if user exists, redirect home
 
       // If user not found, insert the new user
-      myDataBase.collection("users").insertOne(
+      myDataBase.insertOne(
         { username: req.body.username, password: req.body.password }, 
         (err, doc) => {
           if (!err && doc) {
