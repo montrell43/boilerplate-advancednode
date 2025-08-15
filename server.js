@@ -14,8 +14,13 @@ const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser")
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: 'https://www.freecodecamp.org', // <-- The origin of the FCC test runner
+  credentials: true // <-- Allow cookies and credentials to be sent
+};
 
+// --> Use the configured CORS options
+app.use(cors(corsOptions));
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views/pug'));
 
