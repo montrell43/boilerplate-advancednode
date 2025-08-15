@@ -61,10 +61,8 @@ app.get('/logout', (req, res) => {
   
   try {
     // For Passport >= 0.6
-    req.logout(() => {
-      // Ignore session destroy for now
-      res.status(200).send('Logged out');
-    });
+    req.logout();
+    res.redirect('/');
   } catch (err) {
     console.error('Logout error:', err);
     res.status(500).send('Logout failed');
