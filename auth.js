@@ -4,19 +4,19 @@ const { ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
 
 module.exports = function(app, myDataBase) {
-  passport.use(new LocalStrategy(
-    (username, password, done) => {
-      myDataBase.findOne({ username: username }, (err, user) => {
-        console.log(`User ${username} attempted to log in.`)
-        if (err) return done(err);
-        if (!user) return done(null, false);
-        // Compare hashed password:
-        bcrypt.compare(password, user.password, (err, result) => {
-          if (err) return done(err);
-          if (!result) return done(null, false);
-          return done(null, user);
-        });
-      });
+  passport.use(new GitHubStrategy({
+      clientID: process.env.GITHUB_CLIENT_ID,
+      ClientSecrect: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: "/auth/github/callback"
+    },
+    function(accessToken, refReshToken, profile, cb) {
+      myDataBase.findAndModify(
+        { id: profile.id },
+        {},
+        { $setOnInsert: { id: profile.id, username: profile.usename, photo: profile.photos[0].value } },
+        { upsert: true, new: true },
+        (err ,doc) => cb(err, doc.value)
+      )
     }
   ));
 
@@ -31,19 +31,19 @@ module.exports = function(app, myDataBase) {
   });
 
   // Register route with password hashing
-  app.post('/register', (req, res) => {
-    const { username, password } = req.body;
-    myDataBase.findOne({ username: username }, (err, user) => {
-      if (err) return res.redirect('/');
-      if (user) return res.redirect('/'); // User exists
+//   app.post('/register', (req, res) => {
+//     const { username, password } = req.body;
+//     myDataBase.findOne({ username: username }, (err, user) => {
+//       if (err) return res.redirect('/');
+//       if (user) return res.redirect('/'); // User exists
 
-      bcrypt.hash(password, 12, (err, hash) => {
-        if (err) return res.redirect('/');
-        myDataBase.insertOne({ username, password: hash }, (err, doc) => {
-          if (err) return res.redirect('/');
-          res.redirect('/');
-        });
-      });
-    });
-  });
-};
+//       bcrypt.hash(password, 12, (err, hash) => {
+//         if (err) return res.redirect('/');
+//         myDataBase.insertOne({ username, password: hash }, (err, doc) => {
+//           if (err) return res.redirect('/');
+//           res.redirect('/');
+//         });
+//       });
+//     });
+//   });
+ };

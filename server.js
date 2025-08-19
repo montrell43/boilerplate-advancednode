@@ -4,7 +4,8 @@ const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
 const myDB = require('./connection');
-const auth = require('./auth');
+const routes = require("./routes.js")
+const auth = require('./auth.js');
 const path = require('path');
 const cors = require("cors");
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
@@ -14,13 +15,30 @@ const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser")
 
 const app = express();
-const corsOptions = {
-  origin: 'https://www.freecodecamp.org', // <-- The origin of the FCC test runner
-  credentials: true // <-- Allow cookies and credentials to be sent
-};
+//const hash = bcrypt.hashSync(req.body.password, 12);
+
+// const corsOptions = {
+//   origin: 'https://www.freecodecamp.org', // <-- The origin of the FCC test runner
+//   credentials: true // <-- Allow cookies and credentials to be sent
+// };
 
 // --> Use the configured CORS options
-app.use(cors(corsOptions));
+
+const allowedOrigins = [
+  'https://www.freecodecamp.org',
+  'null' // needed for FCC's sandboxed iframe origin
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views/pug'));
 
@@ -34,77 +52,16 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-fccTesting(app);
+fccTesting(app); 
 app.use('/public', express.static(path.join(process.cwd() + '/public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 myDB(async (client) => {
   const myDataBase = await client.db('database').collection('users');
-  //auth(app, myDataBase);
-
-  app.route('/').get((req, res) => {
-    res.render('index', {
-      title: 'Connected to Database',
-      message: 'Please log in',
-      showLogin: true,
-      showRegistration: true
-    });
-  });
-
-   app.route('/login').post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
-    res.redirect('/profile');
-  });
-
-  app.route('/profile').get(ensureAuthenticated, (req, res) => {
-  res.render('profile', { username: req.user.username });
+  auth(app, myDataBase);      // auth logic moved to auth.js
+  routes(app, myDataBase);    // route logic moved to routes.js
 });
-
-// Logout route
-app.get('/logout', (req, res) => {
-  console.log('✅ Logout route hit');
-  
-  try {
-    // For Passport >= 0.6
-    req.logout();
-    res.redirect('/');
-  } catch (err) {
-    console.error('Logout error:', err);
-    res.status(500).send('Logout failed');
-  }
-});
-
-
-
-
-app.route('/register')
-  .post(bodyParser.urlencoded({extended: false}),(req, res, next) => {
-    // Step 1: Check if username exists
-    myDataBase.findOne({ username: req.body.username }, (err, user) => {
-      if (err) return next(err);        // on error, call next(err)
-      if (user) return res.redirect('/'); // if user exists, redirect home
-
-      // If user not found, insert the new user
-      myDataBase.insertOne(
-        { username: req.body.username, password: req.body.password }, 
-        (err, doc) => {
-          if (!err && doc) {
-            return res.redirect('/');
-            } else {
-              next(null, doc.ops[0]);
-            }  // on insert error, redirect home
-                       // call next to proceed to authentication will not pass
-        }
-      );
-    });
-  },
-  // Step 2: Authenticate the newly registered user
-  passport.authenticate('local', { failureRedirect: '/' }),
-  // Step 3: Redirect to profile after successful login
-  (req, res) => {
-    res.redirect('/profile');
-  }
-);
 
 // 404 middleware (last)
 app.use((req, res, next) => {
@@ -112,52 +69,6 @@ app.use((req, res, next) => {
     .type('text')
     .send('Not Found');
 });
-
-passport.use(new LocalStrategy((username, password, done) => {
-    myDataBase.findOne({ username: username }, (err, user) => {
-      console.log(`User ${username} attempted to log in.`);
-
-      if (err) { return done(err); }
-      if (!user) { return done(null, false); }
-      if (password !== user.password) { return done(null, false); }
-      return done(null, user);
-    });
-  }));
-
-  passport.serializeUser((user, done) => {
-    done(null, user._id);
-  });
-  
-  passport.deserializeUser((id, done) => {
-    myDataBase.findOne({ _id: new ObjectID(id) }, (err, doc) => {
-      done(null, doc);
-    });
-  });
-  }).catch(e => {
-  app.route('/').get((req, res) => {
-    res.render('index', {
-      title: e,
-      message: 'Unable to connect to database'
-    });
-  });
-});
-
-  
-//    function ensureAuthenticated(req, res, next) {
-//   if (req.isAuthenticated()) {
-//     return next();
-//   }
-//   res.redirect('/');
-// }
-
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    console.log("Checking authenication")
-    return next();
-  }
-  console.log("Not authenicated, redirecting")
-  res.redirect('/');
-}
 
 app.listen(process.env.PORT || 3000, () => {
     console.log('Listening on port ' + (process.env.PORT || 3000));
